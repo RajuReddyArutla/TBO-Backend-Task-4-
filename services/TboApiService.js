@@ -26,28 +26,55 @@ class TboApiService {
       }
 
       const requests = chunks.map((chunk, index) => {
+        // const requestData = {
+        //   // EndUserIp: this.endUserIp,
+        //   // TokenId: this.tokenId, // 🔐 Include if required by TBO
+        //   ResultCount: 0,
+        //   HotelCodes: chunk,
+        //   CheckInDate: checkInDate,
+        //   CheckOutDate: checkOutDate,
+        //   Rooms: rooms,
+        //   MaxRating: 5,
+        //   MinRating: 0,
+        //   ReviewScore: 0,
+        //   IsNearBySearchAllowed: false
+        // };
+
         const requestData = {
-          EndUserIp: this.endUserIp,
-          TokenId: this.tokenId, // 🔐 Include if required by TBO
-          ResultCount: 0,
-          HotelCodes: chunk,
-          CheckInDate: checkInDate,
-          CheckOutDate: checkOutDate,
-          Rooms: rooms,
-          MaxRating: 5,
-          MinRating: 0,
-          ReviewScore: 0,
-          IsNearBySearchAllowed: false
-        };
+          "CheckIn": "2025-06-20",
+          "CheckOut": "2025-06-22",
+          "HotelCodes": "1279415",
+          "GuestNationality": "IN",
+          "PaxRooms": [
+            {
+              "Adults": 1,
+              "Children": 0,
+              "ChildrenAges": null
+            }
+          ],
+          "ResponseTime": 23.0,
+          "IsDetailedResponse": true,
+          "Filters": {
+            "Refundable": false,
+            "NoOfRooms": 0,
+            "MealType": 0,
+            "OrderBy": 0,
+            "StarRating": 0,
+            "HotelName": null
+          }
+        }
 
         console.log(`➡️ Sending batch ${index + 1}/${chunks.length} with ${chunk.length} hotel codes`);
         console.log(`🧾 Request payload for batch ${index + 1}:`, JSON.stringify(requestData, null, 2));
 
         const start = Date.now();
+        const authHeader = `Basic ${Buffer.from(`Hypermiles:Hypermiles@1234`).toString('base64')}`;
+
 
         return axios.post(`${this.baseUrl}/Search`, requestData, {
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': authHeader
           }
         }).then(res => {
           const duration = Date.now() - start;
