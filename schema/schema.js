@@ -6,11 +6,21 @@ import {
   GraphQLFloat,
   GraphQLBoolean,
   GraphQLSchema,
-  GraphQLNonNull
+  GraphQLNonNull,
+  GraphQLInputObjectType
 } from 'graphql';
 import { searchHotelsByCity } from '../controllers/hotelController.js';
 
 // Types
+const CancelPolicyType = new GraphQLObjectType({
+  name: 'CancelPolicy',
+  fields: () => ({
+    FromDate: { type: GraphQLString },
+    ChargeType: { type: GraphQLString },
+    CancellationCharge: { type: GraphQLFloat }
+  })
+});
+
 const RoomType = new GraphQLObjectType({
   name: 'Room',
   fields: () => ({
@@ -23,15 +33,6 @@ const RoomType = new GraphQLObjectType({
     IsRefundable: { type: GraphQLBoolean },
     CancelPolicies: { type: new GraphQLList(CancelPolicyType) },
     RoomPromotion: { type: new GraphQLList(GraphQLString) }
-  })
-});
-
-const CancelPolicyType = new GraphQLObjectType({
-  name: 'CancelPolicy',
-  fields: () => ({
-    FromDate: { type: GraphQLString },
-    ChargeType: { type: GraphQLString },
-    CancellationCharge: { type: GraphQLFloat }
   })
 });
 
@@ -53,10 +54,11 @@ const SearchResultType = new GraphQLObjectType({
   })
 });
 
-const PaxRoomInputType = new GraphQLObjectType({
+// Changed to InputObjectType
+const PaxRoomInputType = new GraphQLInputObjectType({
   name: 'PaxRoomInput',
   fields: () => ({
-    Adults: { type: GraphQLInt },
+    Adults: { type: new GraphQLNonNull(GraphQLInt) },
     Children: { type: GraphQLInt },
     ChildrenAges: { type: new GraphQLList(GraphQLInt) }
   })
@@ -72,19 +74,10 @@ const RootQuery = new GraphQLObjectType({
         city: { type: new GraphQLNonNull(GraphQLString) },
         checkIn: { type: new GraphQLNonNull(GraphQLString) },
         checkOut: { type: new GraphQLNonNull(GraphQLString) },
-        adults: { type: new GraphQLNonNull(GraphQLInt) },
-        children: { type: GraphQLInt }
+        paxRooms: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(PaxRoomInputType))) }
       },
       resolve: async (parent, args) => {
-        const { city, checkIn, checkOut, adults, children = 0 } = args;
-        
-        // Create PaxRooms array
-        const paxRooms = [{
-          Adults: adults,
-          Children: children,
-          ChildrenAges: null
-        }];
-        
+        const { city, checkIn, checkOut, paxRooms } = args;
         return await searchHotelsByCity(city, checkIn, checkOut, paxRooms);
       }
     }
