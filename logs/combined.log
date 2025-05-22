@@ -307,3 +307,43 @@
 {"checkInDate":"2025-07-01","checkOutDate":"2025-07-03","cityName":"Bangalore","level":"info","message":"GraphQL search request received","rooms":[{"ChildAge":[0],"NoOfAdults":1,"NoOfChild":0}],"service":"hotel-booking-service","timestamp":"2025-05-21 16:33:25"}
 {"cityName":"Bangalore","count":458,"level":"info","message":"Hotel codes retrieved","service":"hotel-booking-service","timestamp":"2025-05-21 16:33:25"}
 {"cityName":"Bangalore","level":"info","message":"Hotel search completed","resultsCount":0,"service":"hotel-booking-service","timestamp":"2025-05-21 16:33:27"}
+{"level":"info","message":"Server running on port 3001","service":"hotel-booking-service","timestamp":"2025-05-22 13:40:21"}
+{"level":"info","message":"GraphQL endpoint: http://localhost:3001/graphql","service":"hotel-booking-service","timestamp":"2025-05-22 13:40:21"}
+{"level":"info","message":"REST API endpoint: http://localhost:3001/api","service":"hotel-booking-service","timestamp":"2025-05-22 13:40:21"}
+{"ip":"::1","level":"info","message":"GET /graphql","service":"hotel-booking-service","timestamp":"2025-05-22 13:40:23","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"}
+{"ip":"::1","level":"info","message":"POST /graphql?","service":"hotel-booking-service","timestamp":"2025-05-22 13:40:23","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"}
+{"ip":"::1","level":"info","message":"POST /graphql?","service":"hotel-booking-service","timestamp":"2025-05-22 13:42:05","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"}
+{"checkInDate":"2025-07-01","checkOutDate":"2025-07-03","cityName":"Bangalore","level":"info","message":"GraphQL search request received","rooms":[{"ChildAge":[0],"NoOfAdults":1,"NoOfChild":0}],"service":"hotel-booking-service","timestamp":"2025-05-22 13:42:06"}
+{"cityName":"Bangalore","count":1,"level":"info","message":"Hotel codes retrieved","service":"hotel-booking-service","timestamp":"2025-05-22 13:42:06"}
+{"cityName":"Bangalore","level":"info","message":"Hotel search completed","resultsCount":0,"service":"hotel-booking-service","timestamp":"2025-05-22 13:42:08"}
+{"ip":"::1","level":"info","message":"POST /graphql?","service":"hotel-booking-service","timestamp":"2025-05-22 13:42:21","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"}
+{"checkInDate":"2025-07-01","checkOutDate":"2025-07-03","cityName":"mumbai","level":"info","message":"GraphQL search request received","rooms":[{"ChildAge":[0],"NoOfAdults":1,"NoOfChild":0}],"service":"hotel-booking-service","timestamp":"2025-05-22 13:42:21"}
+{"cityName":"mumbai","count":994,"level":"info","message":"Hotel codes retrieved","service":"hotel-booking-service","timestamp":"2025-05-22 13:42:21"}
+{"cityName":"mumbai","level":"info","message":"Hotel search completed","resultsCount":0,"service":"hotel-booking-service","timestamp":"2025-05-22 13:42:30"}
+{"level":"info","message":"Server running on port 3001","service":"hotel-booking-service","timestamp":"2025-05-22 13:44:39"}
+{"level":"info","message":"GraphQL endpoint: http://localhost:3001/graphql","service":"hotel-booking-service","timestamp":"2025-05-22 13:44:39"}
+{"level":"info","message":"REST API endpoint: http://localhost:3001/api","service":"hotel-booking-service","timestamp":"2025-05-22 13:44:39"}
+{"ip":"::1","level":"info","message":"POST /graphql?","service":"hotel-booking-service","timestamp":"2025-05-22 13:44:44","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"}
+{"checkInDate":"2025-07-01","checkOutDate":"2025-07-03","cityName":"mumbai","level":"info","message":"GraphQL search request received","rooms":[{"ChildAge":[0],"NoOfAdults":1,"NoOfChild":0}],"service":"hotel-booking-service","timestamp":"2025-05-22 13:44:44"}
+{"cityName":"mumbai","count":994,"level":"info","message":"Hotel codes retrieved","service":"hotel-booking-service","timestamp":"2025-05-22 13:44:44"}
+{"cityName":"mumbai","level":"info","message":"Hotel search completed","resultsCount":0,"service":"hotel-booking-service","timestamp":"2025-05-22 13:45:03"}
+{"ip":"::1","level":"info","message":"POST /graphql?","service":"hotel-booking-service","timestamp":"2025-05-22 13:46:17","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"}
+{"checkInDate":"2025-07-01","checkOutDate":"2025-07-03","cityName":"mumbai","level":"info","message":"GraphQL search request received","rooms":[{"ChildAge":[10],"NoOfAdults":1,"NoOfChild":1}],"service":"hotel-booking-service","timestamp":"2025-05-22 13:46:17"}
+{"cityName":"mumbai","count":994,"level":"info","message":"Hotel codes retrieved","service":"hotel-booking-service","timestamp":"2025-05-22 13:46:17"}
+{"cityName":"mumbai","level":"info","message":"Hotel search completed","resultsCount":0,"service":"hotel-booking-service","timestamp":"2025-05-22 13:46:26"}
+{"ip":"::1","level":"info","message":"POST /graphql?","service":"hotel-booking-service","timestamp":"2025-05-22 13:47:51","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"}
+{"checkInDate":"2025-07-01","checkOutDate":"2025-07-03","cityName":"banagalore","level":"info","message":"GraphQL search request received","rooms":[{"ChildAge":[10],"NoOfAdults":1,"NoOfChild":1}],"service":"hotel-booking-service","timestamp":"2025-05-22 13:47:51"}
+{"cityName":"banagalore","level":"warn","message":"No hotels found for city","service":"hotel-booking-service","timestamp":"2025-05-22 13:47:51"}
+{"ip":"::1","level":"info","message":"POST /graphql?","service":"hotel-booking-service","timestamp":"2025-05-22 13:47:56","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"}
+{"checkInDate":"2025-07-01","checkOutDate":"2025-07-03","cityName":"bangalore","level":"info","message":"GraphQL search request received","rooms":[{"ChildAge":[10],"NoOfAdults":1,"NoOfChild":1}],"service":"hotel-booking-service","timestamp":"2025-05-22 13:47:56"}
+{"cityName":"bangalore","count":1,"level":"info","message":"Hotel codes retrieved","service":"hotel-booking-service","timestamp":"2025-05-22 13:47:56"}
+{"cityName":"bangalore","level":"info","message":"Hotel search completed","resultsCount":0,"service":"hotel-booking-service","timestamp":"2025-05-22 13:47:58"}
+{"level":"info","message":"Server running on port 3001","service":"hotel-booking-service","timestamp":"2025-05-22 13:48:27"}
+{"level":"info","message":"GraphQL endpoint: http://localhost:3001/graphql","service":"hotel-booking-service","timestamp":"2025-05-22 13:48:27"}
+{"level":"info","message":"REST API endpoint: http://localhost:3001/api","service":"hotel-booking-service","timestamp":"2025-05-22 13:48:27"}
+{"ip":"::1","level":"info","message":"GET /graphql","service":"hotel-booking-service","timestamp":"2025-05-22 13:48:32","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"}
+{"ip":"::1","level":"info","message":"POST /graphql?","service":"hotel-booking-service","timestamp":"2025-05-22 13:48:32","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"}
+{"ip":"::1","level":"info","message":"POST /graphql?","service":"hotel-booking-service","timestamp":"2025-05-22 13:48:34","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"}
+{"checkInDate":"2025-07-01","checkOutDate":"2025-07-03","cityName":"bangalore","level":"info","message":"GraphQL search request received","rooms":[{"ChildAge":[10],"NoOfAdults":1,"NoOfChild":1}],"service":"hotel-booking-service","timestamp":"2025-05-22 13:48:34"}
+{"cityName":"bangalore","count":1,"level":"info","message":"Hotel codes retrieved","service":"hotel-booking-service","timestamp":"2025-05-22 13:48:34"}
+{"cityName":"bangalore","level":"info","message":"Hotel search completed","resultsCount":0,"service":"hotel-booking-service","timestamp":"2025-05-22 13:48:36"}

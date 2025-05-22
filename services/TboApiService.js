@@ -6,7 +6,7 @@ class TboApiService {
   constructor() {
     this.baseUrl = process.env.TBO_API_URL;
     this.endUserIp = process.env.END_USER_IP || '172.20.20.104';
-    this.tokenId = process.env.TBO_TOKEN_ID || ''; // 🔐 Optional token
+    this.tokenId = process.env.TBO_TOKEN_ID || '';
     this.chunkSize = 100;
   }
 
@@ -16,7 +16,8 @@ class TboApiService {
     return JSON.parse(data);
   }
 
-  async searchHotels(hotelCodes, checkInDate, checkOutDate, rooms) {
+  // ✅ Accept nationality as parameter
+  async searchHotels(hotelCodes, checkInDate, checkOutDate, rooms, nationality = 'IN') {
     try {
       const chunks = this.chunkArray(hotelCodes, this.chunkSize);
 
@@ -25,51 +26,54 @@ class TboApiService {
         return { HotelSearchResult: [] };
       }
 
-      const requests = chunks.map((chunk, index) => {
-        // const requestData = {
-        //   // EndUserIp: this.endUserIp,
-        //   // TokenId: this.tokenId, // 🔐 Include if required by TBO
-        //   ResultCount: 0,
-        //   HotelCodes: chunk,
-        //   CheckInDate: checkInDate,
-        //   CheckOutDate: checkOutDate,
-        //   Rooms: rooms,
-        //   MaxRating: 5,
-        //   MinRating: 0,
-        //   ReviewScore: 0,
-        //   IsNearBySearchAllowed: false
-        // };
-
-        const requestData = {
-          "CheckIn": "2025-06-20",
-          "CheckOut": "2025-06-22",
-          "HotelCodes": "1279415",
-          "GuestNationality": "IN",
-          "PaxRooms": [
-            {
-              "Adults": 1,
-              "Children": 0,
-              "ChildrenAges": null
-            }
-          ],
-          "ResponseTime": 23.0,
-          "IsDetailedResponse": true,
-          "Filters": {
-            "Refundable": false,
-            "NoOfRooms": 0,
-            "MealType": 0,
-            "OrderBy": 0,
-            "StarRating": 0,
-            "HotelName": null
-          }
+      // ✅ Add validation and debugging for rooms
+      console.log('🏠 Raw rooms data received:', JSON.stringify(rooms, null, 2));
+      
+      // ✅ Validate and normalize rooms data
+      const normalizedRooms = rooms.map((room, index) => {
+        const normalizedRoom = {
+          Adults: room.adults || room.Adults || 1, // ✅ Handle both cases + default to 1
+          Children: room.children || room.Children || 0,
+          ChildrenAges: room.childrenAges || room.ChildrenAges || []
+        };
+        
+        console.log(`🏠 Room ${index + 1} normalized:`, normalizedRoom);
+        
+        // ✅ Validation
+        if (normalizedRoom.Adults < 1) {
+          console.warn(`⚠️ Room ${index + 1} has invalid adults count (${normalizedRoom.Adults}), defaulting to 1`);
+          normalizedRoom.Adults = 1;
         }
+        
+        return normalizedRoom;
+      });
+
+      console.log('🏠 Final normalized rooms:', JSON.stringify(normalizedRooms, null, 2));
+
+      const requests = chunks.map((chunk, index) => {
+        const requestData = {
+          CheckIn: checkInDate,
+          CheckOut: checkOutDate,
+          HotelCodes: chunk.join(','),
+          GuestNationality: nationality,
+          PaxRooms: normalizedRooms, // ✅ Use normalized rooms
+          ResponseTime: 23,
+          IsDetailedResponse: true,
+          Filters: {
+            Refundable: false,
+            NoOfRooms: 0,
+            MealType: 0,
+            OrderBy: 0,
+            StarRating: 0,
+            HotelName: null
+          }
+        };
 
         console.log(`➡️ Sending batch ${index + 1}/${chunks.length} with ${chunk.length} hotel codes`);
         console.log(`🧾 Request payload for batch ${index + 1}:`, JSON.stringify(requestData, null, 2));
 
         const start = Date.now();
         const authHeader = `Basic ${Buffer.from(`Hypermiles:Hypermiles@1234`).toString('base64')}`;
-
 
         return axios.post(`${this.baseUrl}/Search`, requestData, {
           headers: {
@@ -119,12 +123,19 @@ class TboApiService {
     return chunks;
   }
 
-  async getHotelDetailsByCity(cityName, checkInDate, checkOutDate, rooms) {
+  async getHotelDetailsByCity(cityName, checkInDate, checkOutDate, rooms, nationality = 'IN') {
+    // ✅ Add validation before calling searchHotels
+    console.log('🏠 Rooms received in getHotelDetailsByCity:', JSON.stringify(rooms, null, 2));
+    
+    if (!rooms || rooms.length === 0) {
+      throw new Error('Rooms data is required');
+    }
+
     const hotelCodes = await this.getHotelCodesFromCache(cityName);
     if (!hotelCodes || hotelCodes.length === 0) {
       throw new Error(`No hotel codes found for city: ${cityName}`);
     }
-    return this.searchHotels(hotelCodes, checkInDate, checkOutDate, rooms);
+    return this.searchHotels(hotelCodes, checkInDate, checkOutDate, rooms, nationality);
   }
 }
 
