@@ -6,12 +6,22 @@ const moment = require('moment');
  * @returns {Object} Validation result with isValid flag and errors
  */
 function validateSearchParams(params) {
-  const { cityName, checkInDate, checkOutDate, rooms } = params;
+  const { cityName, hotelName, checkInDate, checkOutDate, rooms } = params;
   const errors = [];
 
-  // Validate city name
-  if (!cityName || typeof cityName !== 'string' || cityName.trim() === '') {
-    errors.push('City name is required');
+  // Validate that at least one search criteria is provided
+  if (!cityName && !hotelName) {
+    errors.push('Either city name or hotel name must be provided');
+  }
+
+  // Validate cityName only if provided
+  if (cityName !== undefined && (typeof cityName !== 'string' || cityName.trim() === '')) {
+    errors.push('City name must be a non-empty string if provided');
+  }
+
+  // Validate hotelName only if provided
+  if (hotelName !== undefined && (typeof hotelName !== 'string' || hotelName.trim() === '')) {
+    errors.push('Hotel name must be a non-empty string if provided');
   }
 
   // Validate check-in date
@@ -40,26 +50,44 @@ function validateSearchParams(params) {
   if (!rooms || !Array.isArray(rooms) || rooms.length === 0) {
     errors.push('At least one room is required');
   } else {
-    // Validate each room
+    // Validate each room - handle both GraphQL and REST API formats
     rooms.forEach((room, index) => {
-      if (!room.NoOfAdults || room.NoOfAdults < 1) {
+      // Handle both NoOfAdults (GraphQL) and adults (REST) formats
+      const adultsCount = room.NoOfAdults || room.adults || 0;
+      const childrenCount = room.NoOfChild || room.children || 0;
+      const childrenAges = room.ChildAge || room.childrenAges || [];
+
+      if (!adultsCount || adultsCount < 1) {
         errors.push(`Room ${index + 1}: At least one adult is required`);
       }
       
-      if (room.NoOfChild > 0 && (!room.ChildAge || !Array.isArray(room.ChildAge))) {
+      if (childrenCount > 0 && (!childrenAges || !Array.isArray(childrenAges))) {
         errors.push(`Room ${index + 1}: Child ages are required when children are present`);
-      } else if (room.NoOfChild > 0) {
-        if (room.ChildAge.length !== room.NoOfChild) {
+      } else if (childrenCount > 0) {
+        if (childrenAges.length !== childrenCount) {
           errors.push(`Room ${index + 1}: Number of child ages must match number of children`);
         }
         
-        room.ChildAge.forEach((age, ageIndex) => {
-          if (age < 0 || age > 17) {
-            errors.push(`Room ${index + 1}: Child ${ageIndex + 1} age must be between 0 and 17`);
+        childrenAges.forEach((age, ageIndex) => {
+          if (typeof age !== 'number' || age < 0 || age > 17) {
+            errors.push(`Room ${index + 1}: Child ${ageIndex + 1} age must be a number between 0 and 17`);
           }
         });
       }
+
+      // Validate maximum occupancy per room
+      if (adultsCount + childrenCount > 6) {
+        errors.push(`Room ${index + 1}: Maximum 6 guests per room allowed`);
+      }
     });
+  }
+
+  // Validate maximum stay duration (optional business rule)
+  if (isValidDate(checkInDate) && isValidDate(checkOutDate)) {
+    const nights = calculateNights(checkInDate, checkOutDate);
+    if (nights > 30) {
+      errors.push('Maximum stay duration is 30 nights');
+    }
   }
 
   return {
@@ -101,8 +129,24 @@ function calculateNights(checkInDate, checkOutDate) {
   return checkOut.diff(checkIn, 'days');
 }
 
+/**
+ * Normalizes room data to handle both REST and GraphQL formats
+ * @param {Array} rooms - Array of room objects
+ * @returns {Array} Normalized room data
+ */
+function normalizeRoomData(rooms) {
+  if (!Array.isArray(rooms)) return [];
+  
+  return rooms.map(room => ({
+    adults: room.NoOfAdults || room.adults || 1,
+    children: room.NoOfChild || room.children || 0,
+    childrenAges: room.ChildAge || room.childrenAges || []
+  }));
+}
+
 module.exports = {
   validateSearchParams,
   isValidDate,
-  calculateNights
+  calculateNights,
+  normalizeRoomData
 };

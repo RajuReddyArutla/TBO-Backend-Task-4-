@@ -5,10 +5,6 @@ const redisClient = createClient({
   url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
 });
 
-redisClient.on('error', (err) => {
-  console.error('Redis client error:', err);
-});
-
 // Connect Redis client once
 (async () => {
   try {
@@ -20,6 +16,10 @@ redisClient.on('error', (err) => {
     console.error('Redis connection error:', err);
   }
 })();
+
+redisClient.on('error', (err) => {
+  console.error('Redis client error:', err);
+});
 
 // Async get method
 const getAsync = async (key) => {

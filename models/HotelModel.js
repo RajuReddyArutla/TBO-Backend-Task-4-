@@ -33,7 +33,39 @@ class HotelModel {
       console.error('Error fetching hotel codes:', error);
       throw error;
     }
+  }// Get hotel codes by hotel name
+async getHotelCodesByHotelName(hotelName) {
+  try {
+    const cacheKey = `hotel_codes_by_name:${hotelName.toLowerCase()}`;
+    const cachedData = await getAsync(cacheKey);
+
+    if (cachedData) {
+      console.log(`Retrieved hotel codes for ${hotelName} from cache`);
+      return JSON.parse(cachedData);
+    }
+
+    console.log(`Fetching hotel codes for ${hotelName} from database`);
+    const query = `
+      SELECT hotel_code 
+      FROM tbo_master_hotel_details 
+      WHERE hotel_name LIKE ?
+    `;
+
+    const hotelCodes = await db.query(query, [`%${hotelName}%`]);
+
+    const hotelCodeArray = hotelCodes.map(hotel => hotel.hotel_code);
+
+    if (hotelCodeArray.length > 0) {
+      await setAsync(cacheKey, JSON.stringify(hotelCodeArray), 24 * 60 * 60); // 24 hours
+    }
+
+    return hotelCodeArray;
+  } catch (error) {
+    console.error('Error fetching hotel codes by name:', error);
+    throw error;
   }
+}
+
 
   // Save or update hotel details in the database
   async saveHotelDetails(hotelDetails) {

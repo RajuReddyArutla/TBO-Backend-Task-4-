@@ -58,10 +58,11 @@ const schema = buildSchema(`
 
   type Query {
     searchHotels(
-      cityName: String!, 
-      checkInDate: String!, 
-      checkOutDate: String!, 
-      rooms: [RoomInput]!, 
+      cityName: String,            # Optional now
+      hotelName: String,           # New optional argument
+      checkInDate: String!,
+      checkOutDate: String!,
+      rooms: [RoomInput]!,
       nationality: String
     ): SearchResult
   }

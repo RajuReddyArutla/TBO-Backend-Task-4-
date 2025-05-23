@@ -5,10 +5,10 @@ const logger = require('../utils/logger');
 
 // GraphQL resolvers
 const resolvers = {
-  searchHotels: async ({ cityName, checkInDate, checkOutDate, rooms, nationality }) => {
+  searchHotels: async ({ cityName, hotelName, checkInDate, checkOutDate, rooms, nationality }) => {
     try {
-      // Validate search parameters
-      const validationResult = validateSearchParams({ cityName, checkInDate, checkOutDate, rooms });
+      // Validate search parameters including hotelName
+      const validationResult = validateSearchParams({ cityName, hotelName, checkInDate, checkOutDate, rooms });
       if (!validationResult.isValid) {
         logger.error('Invalid search parameters', { errors: validationResult.errors });
         return { 
@@ -18,51 +18,81 @@ const resolvers = {
         };
       }
 
-      logger.info('GraphQL search request received', { 
-        cityName, 
-        checkInDate, 
-        checkOutDate, 
-        rooms 
-      });
+      logger.info('GraphQL search request received', { cityName, hotelName, checkInDate, checkOutDate, rooms });
 
-      // Get hotel codes for the specified city
-      const hotelCodes = await HotelModel.getHotelCodesByCity(cityName);
-      
-      if (!hotelCodes || hotelCodes.length === 0) {
-        logger.warn('No hotels found for city', { cityName });
+      let hotelCodes = [];
+
+      if (hotelName) {
+        // FIXED: Use correct method name and variable
+        console.log('Hotel name received:', hotelName);
+        hotelCodes = await HotelModel.getHotelCodesByHotelName(hotelName);
+        console.log('Resolved hotelCodes:', hotelCodes);
+      } else if (cityName) {
+        hotelCodes = await HotelModel.getHotelCodesByCity(cityName);
+      } else {
+        logger.error('No search criteria provided');
         return { 
-          success: true, 
-          message: `No hotels found in ${cityName}`, 
+          success: false, 
+          message: 'Please provide either cityName or hotelName', 
           data: [] 
         };
       }
 
-      logger.info('Hotel codes retrieved', { 
-        cityName, 
-        count: hotelCodes.length 
-      });
+      if (!hotelCodes || hotelCodes.length === 0) {
+        const location = cityName || hotelName;
+        logger.warn('No hotels found', { location });
+        return { 
+          success: true, 
+          message: `No hotels found for "${location}"`, 
+          data: [] 
+        };
+      }
 
-      // Search for available hotels using TBO API
-      const searchResults = await TboApiService.searchHotels(
-        hotelCodes,
-        checkInDate,
-        checkOutDate,
-        rooms
-      );
+      logger.info('Hotel codes retrieved', { count: hotelCodes.length, location: cityName || hotelName });
 
-      // Process and format the search results
-      const formattedResults = formatSearchResults(searchResults, nationality);
-      
-      logger.info('Hotel search completed', { 
-        cityName, 
-        resultsCount: formattedResults.length 
-      });
+      // Call Tbo API service to search hotels
+      // const searchResults = await TboApiService.searchHotels(
+      //   hotelCodes,
+      //   checkInDate,
+      //   checkOutDate,
+      //   rooms
+      // );
+      const searchResults = await TboApiService.searchHotelsByCriteria(
+  { cityName, hotelName }, 
+  checkInDate, 
+  checkOutDate, 
+  rooms, 
+  nationality
+);
+const formattedResults = formatSearchResults(searchResults, nationality);
 
-      return {
-        success: true,
-        message: 'Hotel search completed successfully',
-        data: formattedResults
-      };
+// Determine the message based on the TBO API response
+let message = 'Hotel search completed successfully';
+if (
+  searchResults?.Status?.Code === 201 &&
+  searchResults?.Status?.Description === 'No Available rooms for given criteria'
+) {
+  message = 'No Available rooms for given criteria';
+  logger.warn('No rooms available for given criteria');
+}
+
+logger.info('Hotel search completed', { resultsCount: formattedResults.length });
+
+return {
+  success: true,
+  message,
+  data: formattedResults
+};
+
+      // const formattedResults = formatSearchResults(searchResults, nationality);
+
+      // logger.info('Hotel search completed', { resultsCount: formattedResults.length });
+
+      // return {
+      //   success: true,
+      //   message: 'Hotel search completed successfully',
+      //   data: formattedResults
+      // };
     } catch (error) {
       logger.error('Error in GraphQL searchHotels resolver', { error: error.message, stack: error.stack });
       return {
@@ -74,14 +104,14 @@ const resolvers = {
   }
 };
 
-// Format search results (helper function)
+// Helper function: format search results
 function formatSearchResults(results, nationality) {
-  if (!results || !results.HotelResultList || !Array.isArray(results.HotelResultList)) {
+  if (!results || !results.HotelSearchResult || !Array.isArray(results.HotelSearchResult)) {
     return [];
   }
 
-  return results.HotelResultList.map(hotel => {
-    // Get the appropriate price based on nationality if applicable
+  return results.HotelSearchResult.map(hotel => {
+    // Determine price based on nationality
     const price = getPriceByNationality(hotel, nationality);
 
     return {
@@ -104,15 +134,15 @@ function formatSearchResults(results, nationality) {
   });
 }
 
-// Get price based on nationality (helper function)
+// Helper function: get price based on nationality
 function getPriceByNationality(hotel, nationality) {
   if (!hotel.Price) return 'Price not available';
   
-  // Apply nationality-based pricing logic here if needed
+  // Add nationality pricing logic here if needed
   return hotel.Price.OfferedPrice || hotel.Price.PublishedPrice;
 }
 
-// Format room types (helper function)
+// Helper function: format room types
 function formatRoomTypes(roomTypes) {
   if (!roomTypes || !Array.isArray(roomTypes)) {
     return [];
