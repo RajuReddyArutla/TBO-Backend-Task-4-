@@ -50,7 +50,8 @@ export const getHotelCodesFromDB = async (city) => {
   try {
     conn = await getDBPool().getConnection();
     const rows = await conn.query(
-      'SELECT hotel_code FROM tbo_master_hotel_details WHERE city_Name = ?',
+      // 'SELECT hotel_code FROM tbo_master_hotel_details WHERE city_Name = ?',
+     'SELECT hotel_code FROM tbo_master_hotel_details WHERE LOWER(TRIM(city_Name)) = LOWER(TRIM(?))',
       [city]
     );
 

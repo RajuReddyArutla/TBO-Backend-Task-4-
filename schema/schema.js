@@ -9,7 +9,8 @@ import {
   GraphQLNonNull,
   GraphQLInputObjectType
 } from 'graphql';
-import { searchHotelsByCity } from '../controllers/hotelController.js';
+// Fixed import - import from service layer instead of controller
+import { searchHotelsByCity, searchHotelByName } from '../services/hotelService.js';
 
 // Types
 const CancelPolicyType = new GraphQLObjectType({
@@ -71,14 +72,28 @@ const RootQuery = new GraphQLObjectType({
     searchHotels: {
       type: SearchResultType,
       args: {
-        city: { type: new GraphQLNonNull(GraphQLString) },
+        city: { type: GraphQLString }, // Made optional to allow hotelName search
+        hotelName: { type: GraphQLString }, // New optional argument
         checkIn: { type: new GraphQLNonNull(GraphQLString) },
         checkOut: { type: new GraphQLNonNull(GraphQLString) },
         paxRooms: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(PaxRoomInputType))) }
       },
       resolve: async (parent, args) => {
-        const { city, checkIn, checkOut, paxRooms } = args;
-        return await searchHotelsByCity(city, checkIn, checkOut, paxRooms);
+        const { city, hotelName, checkIn, checkOut, paxRooms } = args;
+
+        if (hotelName) {
+          // Search by hotel name
+          return await searchHotelByName(hotelName, checkIn, checkOut, paxRooms);
+        } else if (city) {
+          // Search by city
+          return await searchHotelsByCity(city, checkIn, checkOut, paxRooms);
+        } else {
+          return {
+            success: false,
+            message: 'Please provide either city or hotelName to search hotels.',
+            results: null
+          };
+        }
       }
     }
   }
